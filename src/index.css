@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --color-light: #FFF9F7;
+  --color-dark: #2C2C2C;
+}
+
+.accent-text {
+  @apply text-[#867B9F];
+}
+
+body {
+  font-family: 'Nunito', 'SF Pro Rounded', ui-rounded, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--color-dark);
+  background: var(--color-light);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography Scale */
+h1 {
+  @apply text-4xl font-bold;
+}
+
+h2 {
+  @apply text-2xl font-semibold;
+}
+
+.body-text {
+  @apply text-base font-normal;
+}
+
+.caption-text {
+  @apply text-xs font-light;
+}
+
+/* Auth input fields - only use for auth forms */
+.auth-input-field {
+  @apply w-full px-4 py-3 rounded-container bg-white border border-[#F5EAE3] focus:border-[#C27CA3] focus:ring-1 focus:ring-[#C27CA3] outline-none transition-shadow shadow-sm hover:shadow;
+}
+
+/* Auth buttons - only use for auth forms */
+.auth-button {
+  @apply w-full px-4 py-3 rounded-[28px] bg-[#C27CA3] text-white font-bold hover:bg-[#B06B94] transition-colors shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5EAE3;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C27CA3;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B06B94;
+}
+
+/* Safe area for mobile devices */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Smooth transitions */
+* {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Focus styles for accessibility */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #C27CA3;
+  outline-offset: 2px;
+}
+
+/* Touch targets for mobile */
+@media (max-width: 768px) {
+  button {
+    min-height: 44px;
+  }
+}
