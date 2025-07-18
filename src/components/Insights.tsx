@@ -24,7 +24,7 @@ export function Insights() {
   const getConfidenceColor = (confidence: number) => {
     if (confidence >= 80) return 'text-[#E2F0CB]';
     if (confidence >= 60) return 'text-[#867B9F]';
-    return 'text-[#C27CA3]';
+    return 'text-[#FF2E74]';
   };
 
   const getConfidenceLabel = (confidence: number) => {
@@ -43,7 +43,7 @@ export function Insights() {
 
       {/* AI Advice */}
       {aiAdvice && (
-        <div className="bg-gradient-to-r from-[#C27CA3] to-[#867B9F] rounded-3xl p-6 text-white">
+        <div className="bg-gradient-to-r from-[#FF2E74] to-[#867B9F] rounded-3xl p-6 text-white">
           <div className="flex items-start space-x-3">
             <div className="text-2xl">🤖</div>
             <div className="flex-1">
@@ -66,7 +66,7 @@ export function Insights() {
               className={`
                 p-4 rounded-2xl border-l-4
                 ${alert.type === 'late' 
-                  ? 'bg-[#F8D7DA] border-[#C27CA3] text-[#2C2C2C]'
+                  ? 'bg-[#F8D7DA] border-[#FF2E74] text-[#2C2C2C]'
                   : 'bg-[#E2F0CB] border-[#867B9F] text-[#2C2C2C]'
                 }
               `}
@@ -141,7 +141,7 @@ export function Insights() {
                 <div className="text-xs text-[#867B9F]">Based on your data</div>
               </div>
             </div>
-            <div className="text-[#C27CA3] font-bold">
+            <div className="text-[#FF2E74] font-bold">
               {cycles && cycles.length >= 2 ? 
                 Math.round(cycles.slice(0, 3).reduce((acc, cycle, index, arr) => {
                   if (index === 0) return acc;
@@ -162,7 +162,7 @@ export function Insights() {
                 <div className="text-xs text-[#867B9F]">Typical duration</div>
               </div>
             </div>
-            <div className="text-[#C27CA3] font-bold">5 days</div>
+            <div className="text-[#FF2E74] font-bold">5 days</div>
           </div>
 
           <div className="flex items-center justify-between p-3 bg-[#F5EAE3] rounded-xl">
@@ -185,7 +185,7 @@ export function Insights() {
                   <div className="text-xs text-[#867B9F]">Prediction accuracy</div>
                 </div>
               </div>
-              <div className="text-[#C27CA3] font-bold">
+              <div className="text-[#FF2E74] font-bold">
                 {cycles.length < 3 ? 'Building...' : 
                  cycles.length < 6 ? 'Good' : 'Excellent'}
               </div>

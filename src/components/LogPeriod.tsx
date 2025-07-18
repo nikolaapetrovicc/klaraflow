@@ -81,7 +81,7 @@ export function LogPeriod({ onNavigate }: LogPeriodProps = {}) {
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="w-full p-3 rounded-2xl border border-[#F5EAE3] focus:border-[#C27CA3] focus:ring-1 focus:ring-[#C27CA3] outline-none"
+          className="w-full p-3 rounded-2xl border border-[#F5EAE3] focus:border-[#FF2E74] focus:ring-1 focus:ring-[#FF2E74] outline-none"
         />
       </div>
 
@@ -96,7 +96,7 @@ export function LogPeriod({ onNavigate }: LogPeriodProps = {}) {
               className={`
                 flex-1 py-3 px-4 rounded-[28px] font-semibold text-sm transition-colors
                 ${flow === flowType 
-                  ? 'bg-[#C27CA3] text-white' 
+                  ? 'bg-[#FF2E74] text-white' 
                   : 'bg-[#F5EAE3] text-[#2C2C2C] hover:bg-[#E8D5CE]'
                 }
               `}
@@ -122,7 +122,7 @@ export function LogPeriod({ onNavigate }: LogPeriodProps = {}) {
               className={`
                 flex flex-col items-center p-4 rounded-2xl transition-colors
                 ${mood === moodType 
-                  ? 'bg-[#C27CA3] text-white' 
+                  ? 'bg-[#FF2E74] text-white' 
                   : 'bg-[#F5EAE3] text-[#2C2C2C] hover:bg-[#E8D5CE]'
                 }
               `}
@@ -145,7 +145,7 @@ export function LogPeriod({ onNavigate }: LogPeriodProps = {}) {
               className={`
                 flex items-center space-x-2 p-3 rounded-2xl text-sm font-medium transition-colors
                 ${symptoms.includes(symptom.id)
-                  ? 'bg-[#C27CA3] text-white'
+                  ? 'bg-[#FF2E74] text-white'
                   : 'bg-[#F5EAE3] text-[#2C2C2C] hover:bg-[#E8D5CE]'
                 }
               `}
@@ -164,7 +164,7 @@ export function LogPeriod({ onNavigate }: LogPeriodProps = {}) {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="How are you feeling today? Any additional symptoms or thoughts..."
-          className="w-full p-3 rounded-2xl border border-[#F5EAE3] focus:border-[#C27CA3] focus:ring-1 focus:ring-[#C27CA3] outline-none resize-none h-24"
+          className="w-full p-3 rounded-2xl border border-[#F5EAE3] focus:border-[#FF2E74] focus:ring-1 focus:ring-[#FF2E74] outline-none resize-none h-24"
         />
       </div>
 
@@ -172,7 +172,7 @@ export function LogPeriod({ onNavigate }: LogPeriodProps = {}) {
       <button
         onClick={handleSave}
         disabled={isLoading}
-        className="w-full bg-[#C27CA3] text-white font-bold py-4 px-6 rounded-[28px] text-lg hover:bg-[#B06B94] transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-[#FF2E74] text-white font-bold py-4 px-6 rounded-[28px] text-lg hover:bg-[#B06B94] transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? 'Saving...' : 'Save Entry'}
       </button>

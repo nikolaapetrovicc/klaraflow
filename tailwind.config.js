@@ -7,11 +7,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#C27CA3',
+        primary: '#FF2E74',
         'primary-hover': '#B06B94',
         secondary: '#2C2C2C',
         accent: '#867B9F',
-        background: '#FFF9F7',
+        background: '#F5F5F5',
         'card-bg': '#F5EAE3',
         fertile: '#E2F0CB',
       },

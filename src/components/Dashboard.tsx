@@ -1,6 +1,7 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { FullMonthCalendar } from "./FullMonthCalendar";
 
 interface DashboardProps {
   onNavigate?: (screen: 'dashboard' | 'log' | 'insights' | 'history' | 'calendar') => void;
@@ -12,6 +13,8 @@ export function Dashboard({ onNavigate }: DashboardProps = {}) {
   const predictions = useQuery(api.cycles.getPredictions);
   const motivationalQuote = useQuery(api.cycles.getMotivationalQuote);
   const generatePredictions = useMutation(api.cycles.generatePredictions);
+  const [showFullCalendar, setShowFullCalendar] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
 
   useEffect(() => {
     // Generate predictions when component mounts
@@ -35,18 +38,58 @@ export function Dashboard({ onNavigate }: DashboardProps = {}) {
   const isPeriodDay = (date: Date) => {
     if (!cycles) return false;
     const dateStr = date.toISOString().split('T')[0];
-    return cycles.some(cycle => cycle.date === dateStr);
+    
+    // Check if this date is a logged period start
+    const isLoggedPeriod = cycles.some(cycle => {
+      const cycleStart = new Date(cycle.date);
+      const cycleEnd = new Date(cycleStart);
+      cycleEnd.setDate(cycleStart.getDate() + 4); // 5-day period
+      
+      const checkDate = new Date(dateStr);
+      return checkDate >= cycleStart && checkDate <= cycleEnd;
+    });
+    
+    return isLoggedPeriod;
+  };
+
+  const getPredictedPeriodDates = () => {
+    if (!cycles || cycles.length < 2) return [];
+    
+    // Calculate average cycle length
+    const cycleLengths = [];
+    for (let i = 1; i < cycles.length; i++) {
+      const prevDate = new Date(cycles[i-1].date);
+      const currDate = new Date(cycles[i].date);
+      const diff = Math.abs((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+      cycleLengths.push(diff);
+    }
+    
+    const avgCycleLength = Math.round(cycleLengths.reduce((a, b) => a + b, 0) / cycleLengths.length);
+    
+    // Get the most recent period start
+    const lastPeriodStart = new Date(cycles[0].date);
+    
+    // Predict next 3 periods
+    const predictedDates = [];
+    for (let i = 1; i <= 3; i++) {
+      const nextPeriodStart = new Date(lastPeriodStart);
+      nextPeriodStart.setDate(lastPeriodStart.getDate() + (avgCycleLength * i));
+      
+      // Add 5 days for each predicted period
+      for (let day = 0; day < 5; day++) {
+        const periodDay = new Date(nextPeriodStart);
+        periodDay.setDate(nextPeriodStart.getDate() + day);
+        predictedDates.push(periodDay.toISOString().split('T')[0]);
+      }
+    }
+    
+    return predictedDates;
   };
 
   const isPredictedPeriodDay = (date: Date) => {
-    if (!predictions || predictions.length === 0) return false;
+    const predictedDates = getPredictedPeriodDates();
     const dateStr = date.toISOString().split('T')[0];
-    
-    return predictions.some(prediction => {
-      const startDate = prediction.predictedStart;
-      const endDate = prediction.predictedEnd;
-      return dateStr >= startDate && dateStr <= endDate;
-    });
+    return predictedDates.includes(dateStr);
   };
 
   const isFertileDay = (date: Date) => {
@@ -68,7 +111,18 @@ export function Dashboard({ onNavigate }: DashboardProps = {}) {
     return dateStr >= fertileStartStr && dateStr <= ovulationStr;
   };
 
-  const calendarDays = getCalendarDays();
+  // Calculate 7 days centered on today
+  const today = new Date();
+  const calendarDays = [];
+  for (let i = -3; i <= 3; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    calendarDays.push(date);
+  }
+
+  // Get period dates (as ISO strings)
+  const periodDates = cycles ? cycles.map(c => c.date) : [];
+  const predictedPeriodDates = getPredictedPeriodDates();
 
   return (
     <div className="p-6 space-y-6">
@@ -80,7 +134,7 @@ export function Dashboard({ onNavigate }: DashboardProps = {}) {
 
       {/* Motivational Quote */}
       {motivationalQuote && (
-        <div className="bg-gradient-to-r from-[#C27CA3] to-[#867B9F] rounded-3xl p-6 text-white">
+        <div className="bg-gradient-to-r from-[#FF2E74] to-[#867B9F] rounded-3xl p-6 text-white">
           <div className="text-center">
             <div className="text-2xl mb-3">✨</div>
             <p className="text-sm font-medium italic mb-2">"{motivationalQuote.quote}"</p>
@@ -95,7 +149,7 @@ export function Dashboard({ onNavigate }: DashboardProps = {}) {
           <h2 className="text-lg font-semibold text-[#2C2C2C] mb-2">Next Period</h2>
           {nextPeriodDays !== null && nextPeriodDays !== undefined ? (
             <div>
-              <div className="text-4xl font-bold text-[#C27CA3] mb-1">
+              <div className="text-4xl font-bold text-[#FF2E74] mb-1">
                 {nextPeriodDays}
               </div>
               <p className="text-[#867B9F] text-sm">
@@ -111,24 +165,22 @@ export function Dashboard({ onNavigate }: DashboardProps = {}) {
       </div>
 
       {/* Calendar Strip */}
-      <div className="bg-white rounded-3xl p-4 shadow-sm border border-[#F5EAE3]">
+      <div className="bg-white rounded-3xl p-4 shadow-sm border border-[#F5EAE3] cursor-pointer" onClick={() => setShowFullCalendar(true)}>
         <h3 className="text-lg font-semibold text-[#2C2C2C] mb-4 text-center">This Week</h3>
         <div className="flex justify-between space-x-1">
           {calendarDays.map((date, index) => {
-            const isToday = date.toDateString() === new Date().toDateString();
+            const isToday = date.toDateString() === today.toDateString();
             const isPeriod = isPeriodDay(date);
             const isPredicted = isPredictedPeriodDay(date);
             const isFertile = isFertileDay(date);
-            
             return (
               <div
                 key={index}
-                className={`
-                  w-12 h-12 rounded-xl flex flex-col items-center justify-center text-xs
-                  ${isToday ? 'ring-2 ring-[#C27CA3]' : ''}
-                  ${isPeriod ? 'bg-[#C27CA3] text-white' : 
-                    isPredicted ? 'bg-[#C27CA3]/50 text-white' :
-                    isFertile ? 'bg-[#E2F0CB] text-[#2C2C2C]' : 
+                className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center text-xs transition-colors
+                  ${isToday ? 'ring-2 ring-[#FF2E74]' : ''}
+                  ${isPeriod ? 'bg-[#FF2E74] text-white' :
+                    isPredicted ? 'bg-[#FF2E74]/50 text-white' :
+                    isFertile ? 'bg-[#E2F0CB] text-[#2C2C2C]' :
                     'bg-[#F5EAE3] text-[#2C2C2C]'}
                 `}
               >
@@ -140,28 +192,38 @@ export function Dashboard({ onNavigate }: DashboardProps = {}) {
             );
           })}
         </div>
-        
-        {/* Legend */}
-        <div className="flex justify-center space-x-4 mt-4 text-xs">
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-3 bg-[#C27CA3] rounded"></div>
-            <span className="text-[#2C2C2C]">Period</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-3 bg-[#C27CA3]/50 rounded"></div>
-            <span className="text-[#2C2C2C]">Predicted</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-3 bg-[#E2F0CB] rounded"></div>
-            <span className="text-[#2C2C2C]">Fertile</span>
-          </div>
+        <div className="text-center text-xs text-[#867B9F] mt-2">Tap to view full month</div>
+      </div>
+      
+      {/* Legend */}
+      <div className="flex justify-center space-x-4 text-xs">
+        <div className="flex items-center space-x-1">
+          <div className="w-3 h-3 bg-[#FF2E74] rounded"></div>
+          <span className="text-[#2C2C2C]">Period</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <div className="w-3 h-3 bg-[#FF2E74]/50 rounded"></div>
+          <span className="text-[#2C2C2C]">Predicted</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <div className="w-3 h-3 bg-[#E2F0CB] rounded"></div>
+          <span className="text-[#2C2C2C]">Fertile</span>
         </div>
       </div>
-
+      {showFullCalendar && (
+        <FullMonthCalendar
+          month={currentMonth}
+          periodDates={periodDates}
+          predictedPeriodDates={predictedPeriodDates}
+          onClose={() => setShowFullCalendar(false)}
+          onMonthChange={(newMonth) => setCurrentMonth(newMonth)}
+        />
+      )}
+        
       {/* Log Period Button */}
       <button 
         onClick={() => onNavigate?.('log')}
-        className="w-full bg-[#C27CA3] text-white font-bold py-4 px-6 rounded-[28px] text-lg hover:bg-[#B06B94] transition-colors shadow-lg"
+        className="w-full bg-[#FF2E74] text-white font-bold py-4 px-6 rounded-[28px] text-lg hover:bg-[#B06B94] transition-colors shadow-lg"
       >
         Log Period
       </button>
@@ -196,7 +258,7 @@ export function Dashboard({ onNavigate }: DashboardProps = {}) {
             {onNavigate && (
               <button
                 onClick={() => onNavigate('history')}
-                className="text-[#C27CA3] text-sm font-medium hover:text-[#B06B94] transition-colors"
+                className="text-[#FF2E74] text-sm font-medium hover:text-[#B06B94] transition-colors"
               >
                 View All
               </button>
@@ -213,7 +275,7 @@ export function Dashboard({ onNavigate }: DashboardProps = {}) {
                   <div className={`w-3 h-3 rounded-full ${
                     cycle.flow === 'light' ? 'bg-[#E2F0CB]' :
                     cycle.flow === 'medium' ? 'bg-[#867B9F]' :
-                    'bg-[#C27CA3]'
+                    'bg-[#FF2E74]'
                   }`}></div>
                   <div>
                     <div className="text-sm font-medium text-[#2C2C2C]">

@@ -18,7 +18,7 @@ export function CycleHistory() {
     switch (flow) {
       case 'light': return 'bg-[#E2F0CB] text-[#2C2C2C]';
       case 'medium': return 'bg-[#867B9F] text-white';
-      case 'heavy': return 'bg-[#C27CA3] text-white';
+      case 'heavy': return 'bg-[#FF2E74] text-white';
       default: return 'bg-[#F5EAE3] text-[#2C2C2C]';
     }
   };
@@ -92,7 +92,7 @@ export function CycleHistory() {
       {/* Stats Summary */}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-[#F5EAE3] text-center">
-          <div className="text-2xl font-bold text-[#C27CA3] mb-1">{cycles.length}</div>
+          <div className="text-2xl font-bold text-[#FF2E74] mb-1">{cycles.length}</div>
           <div className="text-xs text-[#2C2C2C]">Total Entries</div>
         </div>
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-[#F5EAE3] text-center">

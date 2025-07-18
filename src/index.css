@@ -5,7 +5,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;500;600;700;800;900&display=swap');
 
 :root {
-  --color-light: #FFF9F7;
+  --color-light: #F5F5F5;
   --color-dark: #2C2C2C;
 }
 
@@ -40,12 +40,12 @@ h2 {
 
 /* Auth input fields - only use for auth forms */
 .auth-input-field {
-  @apply w-full px-4 py-3 rounded-container bg-white border border-[#F5EAE3] focus:border-[#C27CA3] focus:ring-1 focus:ring-[#C27CA3] outline-none transition-shadow shadow-sm hover:shadow;
+  @apply w-full px-4 py-3 rounded-container bg-white border border-[#F5EAE3] focus:border-[#FF2E74] focus:ring-1 focus:ring-[#FF2E74] outline-none transition-shadow shadow-sm hover:shadow;
 }
 
 /* Auth buttons - only use for auth forms */
 .auth-button {
-  @apply w-full px-4 py-3 rounded-[28px] bg-[#C27CA3] text-white font-bold hover:bg-[#B06B94] transition-colors shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply w-full px-4 py-3 rounded-[28px] bg-[#FF2E74] text-white font-bold hover:bg-[#B06B94] transition-colors shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 /* Custom scrollbar */
@@ -58,7 +58,7 @@ h2 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #C27CA3;
+  background: #FF2E74;
   border-radius: 2px;
 }
 
@@ -80,7 +80,7 @@ h2 {
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid #C27CA3;
+  outline: 2px solid #FF2E74;
   outline-offset: 2px;
 }
 
