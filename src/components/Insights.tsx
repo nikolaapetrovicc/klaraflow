@@ -2,9 +2,9 @@ import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 export function Insights() {
+  const cycles = useQuery(api.cycles.getUserCycles);
   const predictions = useQuery(api.cycles.getPredictions);
   const alerts = useQuery(api.cycles.getAlerts);
-  const cycles = useQuery(api.cycles.getUserCycles);
   const aiAdvice = useQuery(api.cycles.getAIAdvice);
 
   const formatDateRange = (start: string, end: string) => {
@@ -164,33 +164,6 @@ export function Insights() {
             </div>
             <div className="text-[#FF2E74] font-bold">5 days</div>
           </div>
-
-          <div className="flex items-center justify-between p-3 bg-[#F5EAE3] rounded-xl">
-            <div className="flex items-center space-x-3">
-              <div className="text-lg">🌱</div>
-              <div>
-                <div className="font-medium text-[#2C2C2C] text-sm">Fertile Window</div>
-                <div className="text-xs text-[#867B9F]">Most likely days</div>
-              </div>
-            </div>
-            <div className="text-[#867B9F] font-bold">Days 12-16</div>
-          </div>
-
-          {cycles && cycles.length > 0 && (
-            <div className="flex items-center justify-between p-3 bg-[#F5EAE3] rounded-xl">
-              <div className="flex items-center space-x-3">
-                <div className="text-lg">📈</div>
-                <div>
-                  <div className="font-medium text-[#2C2C2C] text-sm">Data Quality</div>
-                  <div className="text-xs text-[#867B9F]">Prediction accuracy</div>
-                </div>
-              </div>
-              <div className="text-[#FF2E74] font-bold">
-                {cycles.length < 3 ? 'Building...' : 
-                 cycles.length < 6 ? 'Good' : 'Excellent'}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 

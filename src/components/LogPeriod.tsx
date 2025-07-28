@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { useMutation } from "convex/react";
+import React, { useState } from "react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
 
 interface LogPeriodProps {
-  onNavigate?: (screen: 'dashboard' | 'log' | 'insights' | 'history' | 'calendar') => void;
+  onNavigate?: (screen: string) => void;
 }
 
 export function LogPeriod({ onNavigate }: LogPeriodProps = {}) {
@@ -13,9 +13,20 @@ export function LogPeriod({ onNavigate }: LogPeriodProps = {}) {
   const [mood, setMood] = useState<'happy' | 'neutral' | 'sad'>('neutral');
   const [symptoms, setSymptoms] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
+  
+  // New wellness tracking fields
+  const [crampIntensity, setCrampIntensity] = useState<number>(0);
+  const [energyLevel, setEnergyLevel] = useState<'low' | 'medium' | 'high'>('medium');
+  const [cravings, setCravings] = useState<string[]>([]);
+  const [hungerLevel, setHungerLevel] = useState<number>(3);
+  const [sleepQuality, setSleepQuality] = useState<number>(3);
+  const [stressLevel, setStressLevel] = useState<'low' | 'medium' | 'high'>('medium');
+  const [emotionalState, setEmotionalState] = useState<string[]>([]);
+  
   const [isLoading, setIsLoading] = useState(false);
 
-  const logCycleEntry = useMutation(api.cycles.logCycleEntry);
+  const logCycleEntry = useMutation(api.cycles.logCycleEntryEnhanced);
+  const userPreferences = useQuery(api.cycles.getUserPreferences);
 
   const symptomOptions = [
     { id: 'cramps', label: 'Cramps', icon: '🤕' },
@@ -28,11 +39,54 @@ export function LogPeriod({ onNavigate }: LogPeriodProps = {}) {
     { id: 'mood_swings', label: 'Mood Swings', icon: '🎭' },
   ];
 
+  const cravingOptions = [
+    { id: 'sweet', label: 'Sweet', icon: '🍰' },
+    { id: 'salty', label: 'Salty', icon: '🍟' },
+    { id: 'chocolate', label: 'Chocolate', icon: '🍫' },
+    { id: 'carbs', label: 'Carbs', icon: '🍞' },
+    { id: 'dairy', label: 'Dairy', icon: '🧀' },
+    { id: 'fruits', label: 'Fruits', icon: '🍎' },
+    { id: 'spicy', label: 'Spicy', icon: '🌶️' },
+    { id: 'none', label: 'None', icon: '❌' },
+  ];
+
+  const emotionalOptions = [
+    { id: 'anxious', label: 'Anxious', icon: '😰' },
+    { id: 'calm', label: 'Calm', icon: '😌' },
+    { id: 'irritable', label: 'Irritable', icon: '😤' },
+    { id: 'happy', label: 'Happy', icon: '😊' },
+    { id: 'sad', label: 'Sad', icon: '😢' },
+    { id: 'stressed', label: 'Stressed', icon: '😓' },
+    { id: 'energetic', label: 'Energetic', icon: '⚡' },
+    { id: 'tired', label: 'Tired', icon: '😴' },
+  ];
+
   const toggleSymptom = (symptomId: string) => {
     setSymptoms(prev => 
       prev.includes(symptomId) 
         ? prev.filter(s => s !== symptomId)
         : [...prev, symptomId]
+    );
+  };
+
+  const toggleCraving = (cravingId: string) => {
+    if (cravingId === 'none') {
+      setCravings([]);
+    } else {
+      setCravings(prev => {
+        const withoutNone = prev.filter(c => c !== 'none');
+        return withoutNone.includes(cravingId)
+          ? withoutNone.filter(c => c !== cravingId)
+          : [...withoutNone, cravingId];
+      });
+    }
+  };
+
+  const toggleEmotional = (emotionalId: string) => {
+    setEmotionalState(prev => 
+      prev.includes(emotionalId) 
+        ? prev.filter(e => e !== emotionalId)
+        : [...prev, emotionalId]
     );
   };
 
@@ -45,8 +99,15 @@ export function LogPeriod({ onNavigate }: LogPeriodProps = {}) {
         mood,
         symptoms,
         notes: notes.trim() || undefined,
+        crampIntensity: crampIntensity > 0 ? crampIntensity : undefined,
+        energyLevel,
+        cravings: cravings.length > 0 ? cravings : undefined,
+        hungerLevel,
+        sleepQuality,
+        stressLevel,
+        emotionalState: emotionalState.length > 0 ? emotionalState : undefined,
       });
-      toast.success('Period logged successfully!');
+      toast.success('Entry logged successfully!');
       
       // Reset form
       setDate(new Date().toISOString().split('T')[0]);
@@ -54,24 +115,39 @@ export function LogPeriod({ onNavigate }: LogPeriodProps = {}) {
       setMood('neutral');
       setSymptoms([]);
       setNotes('');
+      setCrampIntensity(0);
+      setEnergyLevel('medium');
+      setCravings([]);
+      setHungerLevel(3);
+      setSleepQuality(3);
+      setStressLevel('medium');
+      setEmotionalState([]);
       
       // Navigate back to dashboard after successful save
       setTimeout(() => {
         onNavigate?.('dashboard');
       }, 1000);
     } catch (error) {
-      toast.error('Failed to log period');
+      toast.error('Failed to log entry');
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Check if user has preferences and what categories are enabled
+  const showCrampIntensity = userPreferences?.trackingCategories?.crampIntensity ?? true;
+  const showEnergyLevel = userPreferences?.trackingCategories?.energyLevel ?? true;
+  const showCravings = userPreferences?.trackingCategories?.cravings ?? true;
+  const showHungerLevel = userPreferences?.trackingCategories?.hungerLevel ?? false;
+  const showSleepStress = userPreferences?.trackingCategories?.sleepStress ?? true;
+  const showEmotionalState = userPreferences?.trackingCategories?.emotionalState ?? true;
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-[#2C2C2C] mb-2">Log Your Period</h1>
-        <p className="text-[#867B9F] text-sm">Track your cycle and symptoms</p>
+        <h1 className="text-2xl font-bold text-[#2C2C2C] mb-2">Log Your Entry</h1>
+        <p className="text-[#867B9F] text-sm">Track your cycle and wellness</p>
       </div>
 
       {/* Date Selection */}
@@ -133,6 +209,176 @@ export function LogPeriod({ onNavigate }: LogPeriodProps = {}) {
           ))}
         </div>
       </div>
+
+      {/* Cramp Intensity */}
+      {showCrampIntensity && (
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#F5EAE3]">
+          <label className="block text-sm font-semibold text-[#2C2C2C] mb-4">Cramp Intensity</label>
+          <div className="flex space-x-2">
+            {[0, 1, 2, 3, 4, 5].map((level) => (
+              <button
+                key={level}
+                onClick={() => setCrampIntensity(level)}
+                className={`
+                  flex-1 py-3 px-2 rounded-2xl text-sm font-medium transition-colors
+                  ${crampIntensity === level 
+                    ? 'bg-[#FF2E74] text-white' 
+                    : 'bg-[#F5EAE3] text-[#2C2C2C] hover:bg-[#E8D5CE]'
+                  }
+                `}
+              >
+                {level === 0 ? 'None' : level}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Energy Level */}
+      {showEnergyLevel && (
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#F5EAE3]">
+          <label className="block text-sm font-semibold text-[#2C2C2C] mb-4">Energy Level</label>
+          <div className="flex space-x-3">
+            {(['low', 'medium', 'high'] as const).map((level) => (
+              <button
+                key={level}
+                onClick={() => setEnergyLevel(level)}
+                className={`
+                  flex-1 py-3 px-4 rounded-[28px] font-semibold text-sm transition-colors
+                  ${energyLevel === level 
+                    ? 'bg-[#FF2E74] text-white' 
+                    : 'bg-[#F5EAE3] text-[#2C2C2C] hover:bg-[#E8D5CE]'
+                  }
+                `}
+              >
+                {level.charAt(0).toUpperCase() + level.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Cravings */}
+      {showCravings && (
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#F5EAE3]">
+          <label className="block text-sm font-semibold text-[#2C2C2C] mb-4">Cravings</label>
+          <div className="grid grid-cols-2 gap-3">
+            {cravingOptions.map((craving) => (
+              <button
+                key={craving.id}
+                onClick={() => toggleCraving(craving.id)}
+                className={`
+                  flex items-center space-x-2 p-3 rounded-2xl text-sm font-medium transition-colors
+                  ${cravings.includes(craving.id)
+                    ? 'bg-[#FF2E74] text-white'
+                    : 'bg-[#F5EAE3] text-[#2C2C2C] hover:bg-[#E8D5CE]'
+                  }
+                `}
+              >
+                <span>{craving.icon}</span>
+                <span>{craving.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Hunger Level */}
+      {showHungerLevel && (
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#F5EAE3]">
+          <label className="block text-sm font-semibold text-[#2C2C2C] mb-4">Hunger Level</label>
+          <div className="flex space-x-2">
+            {[1, 2, 3, 4, 5].map((level) => (
+              <button
+                key={level}
+                onClick={() => setHungerLevel(level)}
+                className={`
+                  flex-1 py-3 px-2 rounded-2xl text-sm font-medium transition-colors
+                  ${hungerLevel === level 
+                    ? 'bg-[#FF2E74] text-white' 
+                    : 'bg-[#F5EAE3] text-[#2C2C2C] hover:bg-[#E8D5CE]'
+                  }
+                `}
+              >
+                {level}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Sleep Quality */}
+      {showSleepStress && (
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#F5EAE3]">
+          <label className="block text-sm font-semibold text-[#2C2C2C] mb-4">Sleep Quality</label>
+          <div className="flex space-x-2">
+            {[1, 2, 3, 4, 5].map((level) => (
+              <button
+                key={level}
+                onClick={() => setSleepQuality(level)}
+                className={`
+                  flex-1 py-3 px-2 rounded-2xl text-sm font-medium transition-colors
+                  ${sleepQuality === level 
+                    ? 'bg-[#FF2E74] text-white' 
+                    : 'bg-[#F5EAE3] text-[#2C2C2C] hover:bg-[#E8D5CE]'
+                  }
+                `}
+              >
+                {level}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Stress Level */}
+      {showSleepStress && (
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#F5EAE3]">
+          <label className="block text-sm font-semibold text-[#2C2C2C] mb-4">Stress Level</label>
+          <div className="flex space-x-3">
+            {(['low', 'medium', 'high'] as const).map((level) => (
+              <button
+                key={level}
+                onClick={() => setStressLevel(level)}
+                className={`
+                  flex-1 py-3 px-4 rounded-[28px] font-semibold text-sm transition-colors
+                  ${stressLevel === level 
+                    ? 'bg-[#FF2E74] text-white' 
+                    : 'bg-[#F5EAE3] text-[#2C2C2C] hover:bg-[#E8D5CE]'
+                  }
+                `}
+              >
+                {level.charAt(0).toUpperCase() + level.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Emotional State */}
+      {showEmotionalState && (
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#F5EAE3]">
+          <label className="block text-sm font-semibold text-[#2C2C2C] mb-4">Emotional State</label>
+          <div className="grid grid-cols-2 gap-3">
+            {emotionalOptions.map((emotion) => (
+              <button
+                key={emotion.id}
+                onClick={() => toggleEmotional(emotion.id)}
+                className={`
+                  flex items-center space-x-2 p-3 rounded-2xl text-sm font-medium transition-colors
+                  ${emotionalState.includes(emotion.id)
+                    ? 'bg-[#FF2E74] text-white'
+                    : 'bg-[#F5EAE3] text-[#2C2C2C] hover:bg-[#E8D5CE]'
+                  }
+                `}
+              >
+                <span>{emotion.icon}</span>
+                <span>{emotion.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Symptoms */}
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#F5EAE3]">

@@ -356,3 +356,270 @@ export const getNextPeriodDays = query({
     return diffDays > 0 ? diffDays : 0;
   },
 });
+
+export const logFertilityEntry = mutation({
+  args: {
+    date: v.string(),
+    type: v.union(
+      v.literal("intercourse"),
+      v.literal("ovulation_test"),
+      v.literal("artificial_fertilization"),
+      v.literal("symptoms")
+    ),
+    details: v.union(
+      v.object({
+        intercourse: v.object({
+          protected: v.boolean(),
+          notes: v.optional(v.string()),
+        }),
+        ovulationTest: v.object({
+          result: v.union(v.literal("positive"), v.literal("negative")),
+          brand: v.optional(v.string()),
+          notes: v.optional(v.string()),
+        }),
+        artificialFertilization: v.object({
+          method: v.union(
+            v.literal("iui"),
+            v.literal("ivf"),
+            v.literal("icsi"),
+            v.literal("other")
+          ),
+          clinic: v.optional(v.string()),
+          doctor: v.optional(v.string()),
+          notes: v.optional(v.string()),
+        }),
+        symptoms: v.object({
+          symptoms: v.array(v.string()),
+          intensity: v.union(v.literal("mild"), v.literal("moderate"), v.literal("severe")),
+          notes: v.optional(v.string()),
+        }),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    // Check if entry already exists for this date and type
+    const existing = await ctx.db
+      .query("fertilityEntries")
+      .withIndex("by_user_and_date", (q) => q.eq("userId", userId).eq("date", args.date))
+      .filter((q) => q.eq(q.field("type"), args.type))
+      .first();
+
+    if (existing) {
+      // Update existing entry
+      await ctx.db.patch(existing._id, {
+        details: args.details,
+      });
+      return existing._id;
+    } else {
+      // Create new entry
+      return await ctx.db.insert("fertilityEntries", {
+        userId,
+        date: args.date,
+        type: args.type,
+        details: args.details,
+      });
+    }
+  },
+});
+
+export const getFertilityEntries = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("fertilityEntries")
+      .withIndex("by_user_and_date", (q) => q.eq("userId", args.userId))
+      .order("desc")
+      .collect();
+  },
+});
+
+export const getUserFertilityEntries = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    return await ctx.db
+      .query("fertilityEntries")
+      .withIndex("by_user_and_date", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect();
+  },
+});
+
+export const createUserPreferences = mutation({
+  args: {
+    purposeMode: v.union(
+      v.literal("cycle_tracking"),
+      v.literal("ttc"),
+      v.literal("wellness_tracking"),
+      v.literal("pregnancy")
+    ),
+    trackingCategories: v.object({
+      ovulation: v.boolean(),
+      pmsSymptoms: v.boolean(),
+      sexLogs: v.boolean(),
+      emotionalState: v.boolean(),
+      cravings: v.boolean(),
+      crampIntensity: v.boolean(),
+      sleepStress: v.boolean(),
+      energyLevel: v.boolean(),
+      hungerLevel: v.boolean(),
+    }),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const now = Date.now();
+    
+    // Set content filtering based on purpose mode
+    const contentFiltering = {
+      showTTCContent: args.purposeMode === "ttc",
+      showPregnancyContent: args.purposeMode === "pregnancy",
+      showWellnessTips: args.purposeMode === "wellness_tracking" || args.purposeMode === "cycle_tracking",
+    };
+
+    return await ctx.db.insert("userPreferences", {
+      userId,
+      purposeMode: args.purposeMode,
+      trackingCategories: args.trackingCategories,
+      contentFiltering,
+      createdAt: now,
+      updatedAt: now,
+    });
+  },
+});
+
+export const updateUserPreferences = mutation({
+  args: {
+    purposeMode: v.optional(v.union(
+      v.literal("cycle_tracking"),
+      v.literal("ttc"),
+      v.literal("wellness_tracking"),
+      v.literal("pregnancy")
+    )),
+    trackingCategories: v.optional(v.object({
+      ovulation: v.boolean(),
+      pmsSymptoms: v.boolean(),
+      sexLogs: v.boolean(),
+      emotionalState: v.boolean(),
+      cravings: v.boolean(),
+      crampIntensity: v.boolean(),
+      sleepStress: v.boolean(),
+      energyLevel: v.boolean(),
+      hungerLevel: v.boolean(),
+    })),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const existing = await ctx.db
+      .query("userPreferences")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+
+    if (!existing) {
+      throw new Error("User preferences not found");
+    }
+
+    const updates: any = { updatedAt: Date.now() };
+    
+    if (args.purposeMode) {
+      updates.purposeMode = args.purposeMode;
+      // Update content filtering based on new purpose mode
+      updates.contentFiltering = {
+        showTTCContent: args.purposeMode === "ttc",
+        showPregnancyContent: args.purposeMode === "pregnancy",
+        showWellnessTips: args.purposeMode === "wellness_tracking" || args.purposeMode === "cycle_tracking",
+      };
+    }
+    
+    if (args.trackingCategories) {
+      updates.trackingCategories = args.trackingCategories;
+    }
+
+    await ctx.db.patch(existing._id, updates);
+    return existing._id;
+  },
+});
+
+export const getUserPreferences = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    return await ctx.db
+      .query("userPreferences")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+  },
+});
+
+export const logCycleEntryEnhanced = mutation({
+  args: {
+    date: v.string(),
+    flow: v.union(v.literal("light"), v.literal("medium"), v.literal("heavy")),
+    mood: v.union(v.literal("happy"), v.literal("neutral"), v.literal("sad")),
+    symptoms: v.array(v.string()),
+    notes: v.optional(v.string()),
+    // New wellness tracking fields
+    crampIntensity: v.optional(v.number()),
+    energyLevel: v.optional(v.union(v.literal("low"), v.literal("medium"), v.literal("high"))),
+    cravings: v.optional(v.array(v.string())),
+    hungerLevel: v.optional(v.number()),
+    sleepQuality: v.optional(v.number()),
+    stressLevel: v.optional(v.union(v.literal("low"), v.literal("medium"), v.literal("high"))),
+    emotionalState: v.optional(v.array(v.string())),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    // Check if entry already exists for this date
+    const existing = await ctx.db
+      .query("cycleEntries")
+      .withIndex("by_user_and_date", (q) => q.eq("userId", userId).eq("date", args.date))
+      .first();
+
+    if (existing) {
+      // Update existing entry
+      await ctx.db.patch(existing._id, {
+        flow: args.flow,
+        mood: args.mood,
+        symptoms: args.symptoms,
+        notes: args.notes,
+        crampIntensity: args.crampIntensity,
+        energyLevel: args.energyLevel,
+        cravings: args.cravings,
+        hungerLevel: args.hungerLevel,
+        sleepQuality: args.sleepQuality,
+        stressLevel: args.stressLevel,
+        emotionalState: args.emotionalState,
+      });
+      return existing._id;
+    } else {
+      // Create new entry
+      return await ctx.db.insert("cycleEntries", {
+        userId,
+        date: args.date,
+        flow: args.flow,
+        mood: args.mood,
+        symptoms: args.symptoms,
+        notes: args.notes,
+        crampIntensity: args.crampIntensity,
+        energyLevel: args.energyLevel,
+        cravings: args.cravings,
+        hungerLevel: args.hungerLevel,
+        sleepQuality: args.sleepQuality,
+        stressLevel: args.stressLevel,
+        emotionalState: args.emotionalState,
+      });
+    }
+  },
+});
