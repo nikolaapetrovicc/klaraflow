@@ -197,13 +197,6 @@ export default function App() {
           </div>
         </div>
       </Unauthenticated>
-      {/* Footer with Klara AI SL branding */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#F5EAE3] p-2 text-center">
-        <p className="text-xs text-[#867B9F]">
-          Developed by <span className="font-semibold text-[#FF2E74]">Klara AI SL</span> • 
-          Built with React & Tailwind CSS
-        </p>
-      </div>
     </div>
   );
 }

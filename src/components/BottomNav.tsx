@@ -167,8 +167,9 @@ export function BottomNav({ currentScreen, onScreenChange }: BottomNavProps) {
 
             {/* Footer */}
             <div className="p-6 border-t border-[#F5EAE3]">
-              <div className="text-center text-sm text-[#867B9F]">
-                Klara Flow v1.0
+              <div className="text-center text-sm text-[#867B9F] space-y-1">
+                <div>Klara Flow v1.0</div>
+                <div>Developed by <span className="font-semibold text-[#FF2E74]">Klara AI</span></div>
               </div>
             </div>
           </div>

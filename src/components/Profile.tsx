@@ -134,29 +134,29 @@ export function Profile() {
         <h2 className="text-lg font-semibold text-[#2C2C2C] mb-4">Tracking Preferences</h2>
         <p className="text-[#867B9F] text-sm mb-4">Choose what you want to track in your daily logs</p>
         <div className="space-y-4">
-          {trackingOptions.map((option) => (
-            <div key={option.id} className="flex items-center justify-between p-4 rounded-2xl bg-[#F5EAE3]">
+          {Object.entries(trackingCategories).map(([key, value]) => (
+            <div key={key} className="flex items-center justify-between p-4 bg-[#F5EAE3] rounded-2xl">
               <div className="flex-1">
-                <h3 className="font-semibold text-[#2C2C2C] text-sm">{option.label}</h3>
-                <p className="text-[#867B9F] text-xs">{option.description}</p>
+                <div className="font-medium text-[#2C2C2C] text-sm">
+                  {trackingOptions.find(option => option.id === key)?.label}
+                </div>
+                <div className="text-xs text-[#867B9F] mt-1">
+                  {trackingOptions.find(option => option.id === key)?.description}
+                </div>
               </div>
               <button
-                onClick={() => handleToggleTracking(option.id)}
+                onClick={() => handleToggleTracking(key)}
                 className={`
-                  w-12 h-6 rounded-full transition-colors relative
-                  ${trackingCategories[option.id as keyof typeof trackingCategories]
-                    ? 'bg-[#FF2E74]'
-                    : 'bg-[#867B9F]'
-                  }
+                  relative inline-flex h-7 w-12 items-center rounded-full transition-colors
+                  ${value ? 'bg-[#FF2E74]' : 'bg-gray-300'}
                 `}
               >
-                <div className={`
-                  w-4 h-4 bg-white rounded-full absolute top-1 transition-transform
-                  ${trackingCategories[option.id as keyof typeof trackingCategories]
-                    ? 'translate-x-6'
-                    : 'translate-x-1'
-                  }
-                `} />
+                <span
+                  className={`
+                    inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform
+                    ${value ? 'translate-x-7' : 'translate-x-1'}
+                  `}
+                />
               </button>
             </div>
           ))}
@@ -213,6 +213,9 @@ export function Profile() {
           </p>
           <p>
             Version 1.0.0 • Made with ❤️ for women's health
+          </p>
+          <p>
+            Developed by <span className="font-semibold text-[#FF2E74]">Klara AI</span>
           </p>
         </div>
       </div>
