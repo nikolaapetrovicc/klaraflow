@@ -200,13 +200,20 @@ export function Profile() {
         {isLoading ? 'Saving...' : 'Save Preferences'}
       </button>
 
-      {/* App Info */}
+      {/* About Klara Flow */}
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#F5EAE3]">
         <h2 className="text-lg font-semibold text-[#2C2C2C] mb-4">About Klara Flow</h2>
         <div className="space-y-3 text-sm text-[#867B9F]">
-          <p>Version 1.0.0</p>
-          <p>Your personalized cycle tracking companion</p>
-          <p>Built with privacy and personalization in mind</p>
+          <p>
+            <strong className="text-[#FF2E74]">Developed by Klara AI SL</strong> - 
+            A modern women's health tracking application designed with inclusivity and personalization in mind.
+          </p>
+          <p>
+            Built with React, TypeScript, and Tailwind CSS for optimal performance and beautiful user experience.
+          </p>
+          <p>
+            Version 1.0.0 • Made with ❤️ for women's health
+          </p>
         </div>
       </div>
     </div>

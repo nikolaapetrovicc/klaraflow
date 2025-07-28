@@ -1,28 +1,140 @@
-# Klara Flow - AI-Powered Cycle Tracking App
-  
-This is a project built with [Chef](https://chef.convex.dev) using [Convex](https://convex.dev) as its backend.
-  
-This project is connected to the Convex deployment named [`proper-bobcat-740`](https://dashboard.convex.dev/d/proper-bobcat-740).
-  
-## Project structure
-  
-The frontend code is in the `app` directory and is built with [Vite](https://vitejs.dev/).
-  
-The backend code is in the `convex` directory.
-  
-`npm run dev` will start the frontend and backend servers.
+# Klara Flow - Women's Health Tracking App
 
-## App authentication
+A modern, personalized women's health tracking application developed by **Klara AI SL** using React, TypeScript, and Tailwind CSS.
 
-Chef apps use [Convex Auth](https://auth.convex.dev/) with Anonymous auth for easy sign in. You may wish to change this before deploying your app.
+## ✨ Features
 
-## Developing and deploying your app
+- **Personalized Purpose Modes** - Choose your tracking goals (Cycle Tracking, TTC, Wellness, Pregnancy)
+- **Modular Tracking** - Enable/disable specific tracking categories
+- **Deep Wellness Insights** - Track cramps, energy, cravings, sleep, stress, and more
+- **Artificial Fertilization Tracking** - Log IUI, IVF, ICSI procedures
+- **AI-Powered Predictions** - Smart period and fertility predictions
+- **Beautiful UI** - Modern, inclusive design with smooth animations
 
-Check out the [Convex docs](https://docs.convex.dev/) for more information on how to develop with Convex.
-* If you're new to Convex, the [Overview](https://docs.convex.dev/understanding/) is a good place to start
-* Check out the [Hosting and Deployment](https://docs.convex.dev/production/) docs for how to deploy your app
-* Read the [Best Practices](https://docs.convex.dev/understanding/best-practices/) guide for tips on how to improve you app further
+## 🚀 Quick Start
 
-## HTTP API
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
 
-User-defined http routes are defined in the `convex/router.ts` file. We split these routes into a separate file from `convex/http.ts` to allow us to prevent the LLM from modifying the authentication routes.
+### Local Development
+```bash
+# Clone the repository
+git clone https://github.com/[your-username]/klara-flow.git
+cd klara-flow
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+The app will open at `http://localhost:5174`
+
+## 🌐 Deployment Options
+
+### Option 1: GitHub Pages (Recommended - Free)
+
+1. **Update package.json homepage**:
+   ```json
+   {
+     "homepage": "https://[your-username].github.io/[your-repo-name]"
+   }
+   ```
+
+2. **Push to GitHub**:
+   ```bash
+   git add .
+   git commit -m "Initial commit"
+   git push origin main
+   ```
+
+3. **Enable GitHub Pages**:
+   - Go to your repository Settings
+   - Navigate to Pages section
+   - Source: Deploy from a branch
+   - Branch: gh-pages
+   - Save
+
+4. **The GitHub Action will automatically deploy** when you push to main branch.
+
+### Option 2: Vercel (Recommended - Free)
+
+1. **Install Vercel CLI**:
+   ```bash
+   npm i -g vercel
+   ```
+
+2. **Deploy**:
+   ```bash
+   vercel
+   ```
+
+3. **Follow the prompts** and your app will be live!
+
+### Option 3: Netlify (Free)
+
+1. **Build the project**:
+   ```bash
+   npm run build
+   ```
+
+2. **Drag the `dist` folder** to [Netlify Drop](https://app.netlify.com/drop)
+
+3. **Your app is live!**
+
+## 📱 Features Overview
+
+### Purpose Modes
+- **Just Tracking My Cycle** - Basic period tracking
+- **Trying to Conceive (TTC)** - Fertility tracking with ovulation
+- **Symptom + Wellness Tracking** - Comprehensive health monitoring
+- **Pregnancy Mode** - Pregnancy-specific features
+
+### Tracking Categories
+- ✅ Ovulation tracking
+- ✅ PMS symptoms
+- ✅ Sex logs
+- ✅ Emotional state
+- ✅ Cravings
+- ✅ Cramp intensity
+- ✅ Sleep & stress
+
+### Wellness Metrics
+- **Cramp Intensity** (0-5 scale)
+- **Energy Level** (Low/Medium/High)
+- **Cravings** (Multi-select)
+- **Hunger Level** (Scale)
+- **Sleep Quality** (1-5)
+- **Stress Level** (Low/Medium/High)
+
+## 🎨 Tech Stack
+
+- **Frontend**: React 18, TypeScript, Vite
+- **Styling**: Tailwind CSS
+- **Build Tool**: Vite
+- **Deployment**: GitHub Pages, Vercel, Netlify
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Developed by Klara AI SL**
+- Inspired by user feedback from existing period tracking apps
+- Built with modern web technologies for optimal performance
+- Designed with inclusivity and personalization in mind
+
+---
+
+**Made with ❤️ by Klara AI SL for women's health**
