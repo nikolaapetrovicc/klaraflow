@@ -209,7 +209,7 @@ export function Profile() {
             A modern women's health tracking application designed with inclusivity and personalization in mind.
           </p>
           <p>
-            Built with React, TypeScript, and Tailwind CSS for optimal performance and beautiful user experience.
+            Built with React and Tailwind CSS for optimal performance and beautiful user experience.
           </p>
           <p>
             Version 1.0.0 • Made with ❤️ for women's health

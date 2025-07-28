@@ -60,4 +60,4 @@ echo "🌐 Your app will be available at: https://$USERNAME.github.io/$REPO_NAME
 echo ""
 echo "💡 The GitHub Action will automatically deploy on future pushes to main branch."
 echo ""
-echo "Developed by Klara AI SL • Built with React, TypeScript & Tailwind CSS" 
+echo "Developed by Klara AI SL • Built with React & Tailwind CSS" 

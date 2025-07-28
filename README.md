@@ -1,6 +1,6 @@
 # Klara Flow - Women's Health Tracking App
 
-A modern, personalized women's health tracking application developed by **Klara AI SL** using React, TypeScript, and Tailwind CSS.
+A modern, personalized women's health tracking application developed by **Klara AI SL** using React and Tailwind CSS.
 
 ## ✨ Features
 
@@ -111,7 +111,7 @@ The app will open at `http://localhost:5174`
 
 ## 🎨 Tech Stack
 
-- **Frontend**: React 18, TypeScript, Vite
+- **Frontend**: React 18, Vite
 - **Styling**: Tailwind CSS
 - **Build Tool**: Vite
 - **Deployment**: GitHub Pages, Vercel, Netlify

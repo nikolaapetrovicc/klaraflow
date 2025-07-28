@@ -28,7 +28,7 @@ export function WelcomeScreen({ onNavigate }: WelcomeScreenProps) {
 
       <div className="mt-8 text-center">
         <p className="text-white opacity-75 text-sm">
-          Built with React, TypeScript & Tailwind CSS
+          Built with React & Tailwind CSS
         </p>
       </div>
     </div>
